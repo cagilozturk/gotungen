@@ -49,3 +49,21 @@
   text-align: center;
   align-self: center;
 }
+
+.delete-button{
+  align-self: end;
+}
+
+.fit-content {
+  width: fit-content !important;
+}
+
+@media only screen and (max-width: 768px) {
+  /* For mobile phones: */
+  .app-logo {
+    width: 95% !important;
+  }
+  .first-row h1 {
+    font-size: 18px;
+  }
+}
