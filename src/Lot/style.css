@@ -41,28 +41,39 @@
 }
 
 .app-h1 {
-  font-family: 'Sofia';
+  font-family: 'Audiowide';
+  /* color: #D3D3D3; */
+  /* 'Audiowide' */
+  /*'Sofia'*/
   /* font-size: 22px; */
 }
 
 .first-row {
   text-align: center;
   align-self: center;
+  background-color: #D3D3D3;
 }
 
-.delete-button{
-  align-self: end;
+.delete-button {
+  align-self: center;
 }
 
 .fit-content {
   width: fit-content !important;
 }
 
+.selected-text-field input,
+.selected-text-field label {
+  font-weight: bold !important;
+}
+
 @media only screen and (max-width: 768px) {
+
   /* For mobile phones: */
   .app-logo {
     width: 95% !important;
   }
+
   .first-row h1 {
     font-size: 18px;
   }

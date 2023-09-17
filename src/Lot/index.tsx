@@ -6,24 +6,28 @@ import Grid from "@mui/material/Unstable_Grid2";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import {
   AppBar,
-  Box,
   Button,
   TextField,
   Toolbar,
-  Typography,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/AddCircleOutline";
+import StartIcon from "@mui/icons-material/PlayCircleFilled";
+import DeleteIcon from "@mui/icons-material/Delete";
+import RepeatIcon from "@mui/icons-material/Loop";
+import { OperationStatus } from "./enums";
 
 export const Lot: React.FC = () => {
-  const [state, setState] = useState<IState>({ userList: [] });
+
+  const initialState: IState = { userList: [], operationStatus: OperationStatus.NotStarted, selectedUserList: [] };
+  const [state, setState] = useState<IState>(initialState);
 
   const renderUserInputs = () => {
     return state.userList.map((user, index) => {
       return (
         <React.Fragment>
-          <Grid xs={5} md={5} lg={4}>
+          <Grid xs={10} md={5} lg={4}>
             <TextField
-              id="standard-basic"
+              id={`txtUser${index}`}
               value={user.name}
               label={`İsim ${index + 1}`}
               variant="standard"
@@ -31,7 +35,7 @@ export const Lot: React.FC = () => {
               autoComplete="off"
             />
           </Grid>
-          <Grid className="delete-button" xs={7} md={7} lg={8}>
+          <Grid className="delete-button" xs={2} md={7} lg={8}>
             <DeleteForeverIcon
               color="error"
               onClick={() => {
@@ -66,10 +70,59 @@ export const Lot: React.FC = () => {
   const removeUserFromList = (index: number) => {
     setState((prev) => {
       const currentState = { ...prev };
-      currentState.userList.splice(index, 1);
+      removeFromArray(currentState.userList, index);
       return currentState;
     });
   };
+
+  const renderSelectedUserInputs = () => {
+    return state.selectedUserList.map((user, index) => {
+      return (
+        <Grid xs={12}>
+          <TextField
+            id={`txtSelectedUser${index}`}
+            value={user.name}
+            label={`Seçilen ${index + 1}. İsim`}
+            variant="standard"
+            autoComplete="off"
+            // disabled
+            className="selected-text-field"
+            aria-readonly
+          />
+        </Grid>
+      );
+    });
+  };
+
+  const getStartIconDisabled = () => {
+    return (state.userList.length < 2 || state.userList.some(user => !user.name));
+  }
+
+  const startLot = () => {
+    setState(prev => { return { ...prev, operationStatus: OperationStatus.Started } });
+
+    const clonedUsers = [...state.userList];
+
+    const indexes = clonedUsers.map((_, index) => {
+      return index;
+    });
+
+    const selectedList: IUser[] = [];
+
+    while (indexes.length > 0) {
+      const randomIndex = Math.floor(Math.random() * indexes.length);
+      const userIndex = indexes[randomIndex];
+      const selected = { ...clonedUsers[userIndex] };
+      selectedList.push(selected);
+      removeFromArray(indexes, randomIndex);
+    }
+
+    setState(prev => { return { ...prev, operationStatus: OperationStatus.Finished, selectedUserList: selectedList } });
+  };
+
+  const removeFromArray = (arr: any[], index: number) => {
+    arr.splice(index, 1);
+  }
 
   return (
     <React.Fragment>
@@ -80,7 +133,7 @@ export const Lot: React.FC = () => {
       </AppBar>
       <Grid container spacing={3} columns={12}>
         <Grid xs={12} className="first-row">
-          <h1 className="app-h1">
+          <h1 className="app-h1 font-effect-3d-float">
             Götüngen Birliği kura sayfasına hoş geldiniz...
           </h1>
         </Grid>
@@ -89,15 +142,13 @@ export const Lot: React.FC = () => {
             container
             xs={6}
             md={6}
-            title="asdasdasdasdsa"
-            border={"CaptionText"}
             columns={12}
             spacing={3}
           >
             <Grid xs={12}>
               <Button
                 component="label"
-                size="large"
+                size="small"
                 variant="contained"
                 startIcon={<AddIcon />}
                 onClick={addUserInput}
@@ -107,16 +158,32 @@ export const Lot: React.FC = () => {
             </Grid>
             {renderUserInputs()}
           </Grid>
-          <Grid xs={6} md={6}>
+          <Grid xs={6} md={6} container spacing={3} columns={12}>
+            <Grid xs={12}>
+              <Button
+                component="label"
+                size="small"
+                variant="outlined"
+                startIcon={state.operationStatus === OperationStatus.NotStarted ? <StartIcon /> : <RepeatIcon />}
+                onClick={startLot}
+                disabled={getStartIconDisabled()}
+              >
+                {state.operationStatus === OperationStatus.NotStarted ? "Kurayı Başlat" : "Tekrarla"}
+              </Button>
+            </Grid>
+            {renderSelectedUserInputs()}
+          </Grid>
+          <Grid xs={12}>
             <Button
               component="label"
-              size="large"
+              size="small"
               variant="outlined"
-              // startIcon={<AddIcon />}
-              onClick={() => {}}
-              disabled={state.userList.length < 2}
+              startIcon={<DeleteIcon />}
+              onClick={() => { setState(initialState) }}
+              style={{ color: "darkred", borderColor: "darkred" }}
+              disabled={state.operationStatus === OperationStatus.Started}
             >
-              Kurayı Başlat
+              TEMİZLE
             </Button>
           </Grid>
         </Grid>
